@@ -36,6 +36,10 @@ module.exports = {
 						callback(err);
 					},
 					ok: function(callback){
+						if(!callback){
+							callback = this.next;
+						}
+
 						return ok(this.error, callback);
 					},
 					next: function (data, name) {

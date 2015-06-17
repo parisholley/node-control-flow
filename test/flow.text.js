@@ -18,6 +18,29 @@ describe('index', function () {
 		});
 	});
 
+	it('should call flow next if no function is passed', function (done) {
+		var called = false;
+
+		flow.start({}, [
+			function (flow) {
+				var callback = flow.ok();
+
+				callback();
+			},
+			function (flow) {
+				called = true;
+
+				flow.next();
+			}
+		], function (err) {
+			(err == null).should.be.true;
+
+			called.should.be.true;
+
+			done();
+		});
+	});
+
 	it('should complete and pass data', function (done) {
 		flow.start({}, [
 			function (flow) {
