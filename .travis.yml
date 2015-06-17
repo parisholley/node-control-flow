@@ -1,8 +1,16 @@
 language: node_js
 node_js:
-  - "0.12"
-  - "0.11"
-  - "0.10"
-  - "0.8"
-  - "0.6"
-  - "iojs"
+- '0.12'
+- '0.11'
+- '0.10'
+- '0.8'
+- '0.6'
+- iojs
+deploy:
+  provider: npm
+  email: mail@parisholley.com
+  api_key:
+    secure: kMJSRn856+mgsJX5KyStFj3y9Prnr3frXlAIG9r+5Ehgq2Kws2sMmtWCTPoZ+QfdtrDq99AWahv5DhGsZDRHlw7OKjzmnjvfYGAMUCaIbcgzqMDvBmcdTCbPmIpz1B+Tsi3VDPQq1xaOy9ZTgwXqWBvr/e/7T38yb6dUiGZIeFTI69OdS13rf6UO4iJbFKwYxlhzAijYGdf/smH3Tb4meHUYedo+te6SD5hGzmSFvvaNxX1dFrQLumUNjcMndCzbtsDwXKkfEimE8Sg3cecCGhnlH8Fawf82KdXGN1pCMaFcqU4ofRLMIOY7BxINwSIw48ow8BeshgXYrU40yOZRaNoEzv7rYtuV1yiPqJFOA6fc1xfKfSr5hGzwF980GDSVCHvDz4thG+isgTYUMPwlh3OxCvIWGcQ/DCQ90lMgH4Q+K0bYSXG8S7GcyWXxGSHlHmokqQBwdP808/Cr80QPq+jH6txVkLnVZSazt9/B2KhgqDTN+WmsVgUR0Hnp0a8nSBlUmjDp5FamAEKnEfT/tLFKdiRo7Y1MrQ+4iwO1n6//y2Hpv8jn6Yy0h6M0tZKtUcqYBcdWYkgKxvqxDNN9ZusBhhztePyCjWY7Wvr+0mcNsjHmG2V9HJwSABkPYlwazEIUr9D/Hr6hyDE2kSFC9k3jq6QKGj8dVcHKLAh+md0=
+  on:
+    tags: true
+    repo: parisholley/node-control-flow
