@@ -21,6 +21,43 @@ Another pain point when using a library like async directly, is you end up havin
 
 The best example of this would be to pull data from a remote source (like a database), then for each result execute a series of methods. Sounds simple, but to do so without introducing a ton of boilerplate code is a hassle.
 
+
+## Flow Object API
+
+### next([data, itemName])
+
+Continues processing the flow without interrupting, optionally passing additional data to the context.
+
+#### Arguments
+
+* data - An object of key/value pairs to place in the current context.
+* itemName - When data is an array, it enables fork mode and sets this variable in the context for each item in the list.
+
+### error(err)
+
+As the flow replaces your traditional error callback model, you will use this method to stop execution and passback an error to the flow caller.
+
+### ignore()
+
+When invoked within a flow, all future steps will not execute the and flow will invoke the caller callback immediately. When called within a subflow, the behavior is the same unless it is the last step in the flow, in which it will also terminate the main flow. See examples below.
+
+### okay(callback)
+
+A wrapper around the okay library, this is a convenience method that is the same as running:
+
+```javascript
+ok(flow.error, function(data){
+
+});
+```
+turns into
+
+```javascript
+flow.ok(function(data){
+
+});
+```
+
 ## Examples
 
 ### Basic Use Case

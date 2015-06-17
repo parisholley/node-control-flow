@@ -533,28 +533,4 @@ describe('index', function () {
 			done();
 		});
 	});
-
-	it('should send error callback of true', function (done) {
-		flow({}, [
-			function (flow) {
-				flow.retry();
-			}
-		], function (err) {
-			err.should.eql(true);
-
-			done();
-		});
-	});
-
-	it('should send error callback of delay time', function (done) {
-		flow({}, [
-			function (flow) {
-				flow.retry(30);
-			}
-		], function (err) {
-			err.should.eql(30);
-
-			done();
-		});
-	});
 });

@@ -63,9 +63,6 @@ module.exports = function (context, methods, callback, parent) {
 
 					doFinished()
 				},
-				retry: function (delay) {
-					callback(delay ? delay : true);
-				},
 				ignore: function (chain) {
 					ignore = true;
 
