@@ -1,4 +1,5 @@
 language: node_js
+
 node_js:
 - '0.12'
 - '0.11'
@@ -6,6 +7,11 @@ node_js:
 - '0.8'
 - '0.6'
 - iojs
+
+notifications:
+  on_success: never
+  on_failure: change
+
 deploy:
   provider: npm
   email: mail@parisholley.com
