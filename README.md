@@ -41,7 +41,7 @@ As the flow replaces your traditional error callback model, you will use this me
 
 When invoked within a flow, all future steps will not execute the and flow will invoke the caller callback immediately. When called within a subflow, the behavior is the same unless it is the last step in the flow, in which it will also terminate the main flow. See examples below.
 
-### okay([callback])
+### ok([callback])
 
 A wrapper around the okay library, this is a convenience method that is the same as running the example below. If a callback is not passed, flow.next() will be invoked.
 
