@@ -2,6 +2,40 @@ require('chai').should();
 var flow = require('../src/flow');
 
 describe('index', function () {
+	it('should error out when using flow.ok', function (done) {
+		flow({}, [
+			function (flow) {
+				var callback = flow.ok(function(){
+					fail();
+				});
+
+				callback('fail');
+			}
+		], function (err) {
+			err.should.equal('fail');
+
+			done();
+		});
+	});
+
+	it('should complete and pass data', function (done) {
+		flow({}, [
+			function (flow) {
+				var callback = flow.ok(function(data){
+					data.should.equal('data');
+
+					flow.next();
+				});
+
+				callback(null, 'data');
+			}
+		], function (err) {
+			(err == null).should.be.true;
+
+			done();
+		});
+	});
+
 	it('should complete', function (done) {
 		flow({}, [
 			function (flow) {

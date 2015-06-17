@@ -1,11 +1,12 @@
 {
   "name": "node-control-flow",
   "description": "A control flow library for javascript intended to handle the orchestration of multiple invocations within a data context.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "get-parameter-names": "0.2.0",
     "underscore": "1.8.3",
-    "async": "0.9.0"
+    "async": "0.9.0",
+    "okay": "1.0.0"
   },
   "scripts": {
     "test": "mocha --recursive --reporter spec test/"

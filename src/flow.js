@@ -1,6 +1,7 @@
 var gpn = require('get-parameter-names')
 var async = require('async');
 var _ = require('underscore');
+var ok = require('okay');
 
 module.exports = function (context, methods, callback, parent) {
 	var ignore = false;
@@ -32,6 +33,9 @@ module.exports = function (context, methods, callback, parent) {
 			flow: {
 				error: function (err) {
 					callback(err);
+				},
+				ok: function(callback){
+					return ok(this.error, callback);
 				},
 				next: function (data, name) {
 					if (_.isArray(data)) {
