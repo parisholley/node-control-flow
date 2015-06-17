@@ -109,6 +109,9 @@ module.exports = {
 
 Forked flows allow you to easily define a single "flow" but have it execute multiple times per item. By default, each item will execute in sequence and complete fully before moving on to the next item.
 
+**Note:** It is likely this logic will be moved to a flow.fork() method instead of piggybacking on flow.next()
+
+
 ```javascript
 var flow = require('node-control-flow');
 
