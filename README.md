@@ -105,6 +105,41 @@ module.exports = {
 }
 ```
 
+### Forked Flows
+
+Forked flows allow you to easily define a single "flow" but have it execute multiple times per item. By default, each item will execute in sequence and complete fully before moving on to the next item.
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow(context, [
+			module.exports._firstStep,
+			module.exports._forkStep,
+			module.exports._multipleOne,
+            module.exports._multipleTwo
+		], callback);
+	},
+	_firstStep: function(flow){		
+		flow.next();
+	},
+	_forkStep: function(flow){
+		flow.next(['item1', 'item2'], 'item');
+	},
+	_multipleOne: function(item, flow){
+		// on the first past this will be called with item = 'item1', after _multipleTwo, this will be called again with item = 'item2'
+		flow.next();
+	},
+	_multipleTwo: function(item, flow){
+		// when item = 'item1', flow.next() will jump back to _mulltipleOne and continue with item = 'item2'. When item = 'item2', the main flow will complete.
+		flow.next();
+	}
+}
+```
+
 ### Subflows
 
 A subflow behaves just like a normal flow but it comes with a few features:
