@@ -1,6 +1,8 @@
 # Control Flow
 A control flow library for javascript intended to handle the orchestration of multiple invocations within a data context.
 
+**Note:** This library is released pre-1.0 as the API will most likely change once members of the community provide their input. 
+
 ## Purpose
 
 ### 1. Ability to terminate flow on business errors without using the error callback model.
@@ -15,6 +17,9 @@ Another pain point when using a library like async directly, is you end up havin
 
 The best example of this would be to pull data from a remote source (like a database), then for each result execute a series of methods. Sounds simple, but to do so without introducing a ton of boilerplate code is a hassle.
 
+## Notes
+
+* This library is released pre-1.0 as the API will change once members of the community provide their input. 
 
 ## Examples
 
@@ -82,10 +87,7 @@ module.exports = {
 			module.exports._doThingThree
 		], callback);
 	},
-	_doThingOne: function(flow){
-		// we have access to the var1 object from our context
-		// flow is always injected as the last argument
-		
+	_doThingOne: function(flow){		
 		flow.next();
 	},
 	_doThingTwo: function(flow){
@@ -121,23 +123,23 @@ module.exports = {
 			module.exports._finalStep
 		], callback);
 	},
-	_firstStep: function(flow){
-		// we have access to the var1 object from our context
-		// flow is always injected as the last argument
-		
+	_firstStep: function(flow){		
 		flow.next();
 	},
 	_shouldSubflowExecute: function(flow){
 		// we have an opportunity to abort the subflow via flow.ignore(), and continue the main flow, but in this example we continue
 		
-		flow.next();
+		flow.next({
+			subflowData: 'foobar'
+		});
 	},
-	_doSubflowLogic: function(flow){
+	_doSubflowLogic: function(subflowData, flow){
 		// this will be invoked because _shouldSubflowExecute called flow.next() instead of flow.ignore()
 		
 		flow.next();
 	},
 	_finalStep: function(flow){
+		// subflowData is not available as an argument to this step
 		// this will call because the subflow executed without issue
 		flow.next();
 	}
@@ -160,9 +162,6 @@ module.exports = {
 		], callback);
 	},
 	_firstStep: function(flow){
-		// we have access to the var1 object from our context
-		// flow is always injected as the last argument
-		
 		flow.next();
 	},
 	_shouldSubflowExecute: function(flow){
@@ -195,15 +194,10 @@ module.exports = {
 			module.exports._finalStep
 		], callback);
 	},
-	_firstStep: function(flow){
-		// we have access to the var1 object from our context
-		// flow is always injected as the last argument
-		
+	_firstStep: function(flow){		
 		flow.next();
 	},
 	_shouldSubflowExecute: function(flow){
-		// we have an opportunity to abort the subflow via flow.ignore(), and continue the main flow, but in this example we continue
-		
 		flow.next();
 	},
 	_doSubflowLogic: function(flow){
