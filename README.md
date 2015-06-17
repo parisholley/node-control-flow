@@ -21,10 +21,6 @@ Another pain point when using a library like async directly, is you end up havin
 
 The best example of this would be to pull data from a remote source (like a database), then for each result execute a series of methods. Sounds simple, but to do so without introducing a ton of boilerplate code is a hassle.
 
-## Notes
-
-* This library is released pre-1.0 as the API will change once members of the community provide their input. 
-
 ## Examples
 
 ### Basic Use Case
