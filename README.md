@@ -59,8 +59,14 @@ module.exports = {
 	_doThingTwo: function(var2, var3, flow){
 		// as the next called method, we can introduce new items in the context
 		
-		flow.next({
-			var4: 'new value'
+		doDatabaseCall(function(err, data){
+			if(err){
+				return flow.error(err);
+			}
+		
+			flow.next({
+				var4: data
+			});
 		});
 	},
 	_doThingThree: function(var4, flow){
