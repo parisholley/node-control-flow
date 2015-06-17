@@ -16,50 +16,204 @@ Another pain point when using a library like async directly, is you end up havin
 The best example of this would be to pull data from a remote source (like a database), then for each result execute a series of methods. Sounds simple, but to do so without introducing a ton of boilerplate code is a hassle.
 
 
-### Simple Use
+## Examples
+
+### Basic Use Case
 
 ```javascript
-	var flow = require('node-control-flow');
+var flow = require('node-control-flow');
+
+module.exports = {
+	start: function (callback) {
+		// run setup code, this typically is used to gather all I/O connections, listen to a queue or schedule via timer
+		setTimeout(function(){
+			module.exports._execute(var1, var2, var3, callback);
+		});
+	},
+	_execute: function (var1, var2, var3, callback) {
+		// we encapsulate our orechestration logic in one place to allow for better testing (ie: mocking out I/O)
 	
-	module.exports = {
-		start: function (callback) {
-			// run setup code, this typically is used to gather all I/O connections, listen to a queue or schedule via timer
-			setTimeout(function(){
-				module.exports._execute(var1, var2, var3, callback);
-			});
-		},
-		_execute: function (var1, var2, var3, callback) {
-			// we encapsulate our orechestration logic in one place to allow for better testing (ie: mocking out I/O)
+		var context = {
+			var1: var1,
+			var2: var2,
+			var3: var3
+		};
+
+		flow(context, [
+			module.exports._doThingOne,
+			module.exports._doThingTwo,
+			module.exports._doThingThree
+		], callback);
+	},
+	_doThingOne: function(var1, flow){
+		// we have access to the var1 object from our context
+		// flow is always injected as the last argument
 		
-			var context = {
-				var1: var1,
-				var2: var2,
-				var3: var3
-			};
-	
-			flow(context, [
-				module.exports._doThingOne,
-				module.exports._doThingTwo,
-				module.exports._doThingThree
-			], callback);
-		},
-		_doThingOne: function(var1, flow){
-			// we have access to the var1 object from our context
-			// flow is always injected as the last argument
-			
-			flow.next();
-		},
-		_doThingTwo: function(var2, var3, flow){
-			// as the next called method, we can introduce new items in the context
-			
-			flow.next({
-				var4: 'new value'
-			});
-		},
-		_doThingThree: function(var4, flow){
-			// any method called after _doThingTwo will have access to var4
-			
-			flow.next();
-		}
+		flow.next();
+	},
+	_doThingTwo: function(var2, var3, flow){
+		// as the next called method, we can introduce new items in the context
+		
+		flow.next({
+			var4: 'new value'
+		});
+	},
+	_doThingThree: function(var4, flow){
+		// any method called after _doThingTwo will have access to var4
+		
+		flow.next();
 	}
+}
+```
+
+
+### Flow Interruption
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow(context, [
+			module.exports._doThingOne,
+			module.exports._doThingTwo,
+			module.exports._doThingThree
+		], callback);
+	},
+	_doThingOne: function(flow){
+		// we have access to the var1 object from our context
+		// flow is always injected as the last argument
+		
+		flow.next();
+	},
+	_doThingTwo: function(flow){
+		// because we invoke flow.ignore(), the main flow will stop executing and flow callback will be called
+		
+		flow.ignore();
+	},
+	_doThingThree: function(flow){
+		// this method would never be called
+	}
+}
+```
+
+### Subflows
+
+A subflow behaves just like a normal flow but it comes with a few features:
+
+1. The context is forked in a subflow and any data added to it will be discarded when continuing outside the flow
+2. A subflow can be interrupted in isolation without affecting the main flow UNLESS the last method in the flow initatives the ignore.
+
+#### Subflow Execute + Continue Main Flow
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow(context, [
+			module.exports._firstStep,
+			[module.exports._shouldSubflowExecute, module.exports._doSubflowLogic],
+			module.exports._finalStep
+		], callback);
+	},
+	_firstStep: function(flow){
+		// we have access to the var1 object from our context
+		// flow is always injected as the last argument
+		
+		flow.next();
+	},
+	_shouldSubflowExecute: function(flow){
+		// we have an opportunity to abort the subflow via flow.ignore(), and continue the main flow, but in this example we continue
+		
+		flow.next();
+	},
+	_doSubflowLogic: function(flow){
+		// this will be invoked because _shouldSubflowExecute called flow.next() instead of flow.ignore()
+		
+		flow.next();
+	},
+	_finalStep: function(flow){
+		// this will call because the subflow executed without issue
+		flow.next();
+	}
+}
+```
+
+#### Subflow Interrupt + Continue Main Flow
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow(context, [
+			module.exports._firstStep,
+			[module.exports._shouldSubflowExecute, module.exports._doSubflowLogic],
+			module.exports._finalStep
+		], callback);
+	},
+	_firstStep: function(flow){
+		// we have access to the var1 object from our context
+		// flow is always injected as the last argument
+		
+		flow.next();
+	},
+	_shouldSubflowExecute: function(flow){
+		// any method that calls flow.ignore() in a subflow will still allow the main flow to continue unless it is the last step in the subflow
+		
+		flow.ignore();
+	},
+	_doSubflowLogic: function(flow){
+		// this will not be invoked because the previous step called flow.ignore()
+	},
+	_finalStep: function(flow){
+		// this will call because the subflow executed without issue
+		flow.next();
+	}
+}
+```
+
+#### Subflow Interrupt + Stop Main Flow
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow(context, [
+			module.exports._firstStep,
+			[module.exports._shouldSubflowExecute, module.exports._doSubflowLogic],
+			module.exports._finalStep
+		], callback);
+	},
+	_firstStep: function(flow){
+		// we have access to the var1 object from our context
+		// flow is always injected as the last argument
+		
+		flow.next();
+	},
+	_shouldSubflowExecute: function(flow){
+		// we have an opportunity to abort the subflow via flow.ignore(), and continue the main flow, but in this example we continue
+		
+		flow.next();
+	},
+	_doSubflowLogic: function(flow){
+		// this will cause the entire flow to stop immediately
+		
+		flow.ignore();
+	},
+	_finalStep: function(flow){
+		// this will not be invoked because the last step in the previous subflow called flow.ignore()
+		flow.next();
+	}
+}
 ```
