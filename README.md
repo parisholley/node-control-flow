@@ -81,7 +81,7 @@ module.exports = {
 			var3: var3
 		};
 
-		flow(context, [
+		flow.start(context, [
 			module.exports._doThingOne,
 			module.exports._doThingTwo,
 			module.exports._doThingThree
@@ -124,7 +124,7 @@ module.exports = {
 	_execute: function (callback) {
 		var context = {};
 
-		flow(context, [
+		flow.start(context, [
 			module.exports._doThingOne,
 			module.exports._doThingTwo,
 			module.exports._doThingThree
@@ -158,7 +158,7 @@ module.exports = {
 	_execute: function (callback) {
 		var context = {};
 
-		flow(context, [
+		flow.start(context, [
 			module.exports._firstStep,
 			module.exports._forkStep,
 			module.exports._multipleOne,
@@ -198,7 +198,7 @@ module.exports = {
 	_execute: function (callback) {
 		var context = {};
 
-		flow(context, [
+		flow.start(context, [
 			module.exports._firstStep,
 			[module.exports._shouldSubflowExecute, module.exports._doSubflowLogic],
 			module.exports._finalStep
@@ -236,7 +236,7 @@ module.exports = {
 	_execute: function (callback) {
 		var context = {};
 
-		flow(context, [
+		flow.start(context, [
 			module.exports._firstStep,
 			[module.exports._shouldSubflowExecute, module.exports._doSubflowLogic],
 			module.exports._finalStep
@@ -269,7 +269,7 @@ module.exports = {
 	_execute: function (callback) {
 		var context = {};
 
-		flow(context, [
+		flow.start(context, [
 			module.exports._firstStep,
 			[module.exports._shouldSubflowExecute, module.exports._doSubflowLogic],
 			module.exports._finalStep

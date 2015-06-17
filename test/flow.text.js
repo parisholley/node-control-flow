@@ -3,7 +3,7 @@ var flow = require('../src/flow');
 
 describe('index', function () {
 	it('should error out when using flow.ok', function (done) {
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				var callback = flow.ok(function(){
 					fail();
@@ -19,7 +19,7 @@ describe('index', function () {
 	});
 
 	it('should complete and pass data', function (done) {
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				var callback = flow.ok(function(data){
 					data.should.equal('data');
@@ -37,7 +37,7 @@ describe('index', function () {
 	});
 
 	it('should complete', function (done) {
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			}
@@ -47,7 +47,7 @@ describe('index', function () {
 	});
 
 	it('should complete when ignored', function (done) {
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.ignore();
 			}
@@ -61,7 +61,7 @@ describe('index', function () {
 		var sub2 = false;
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -98,7 +98,7 @@ describe('index', function () {
 	});
 
 	it('should have access to context value in subflows', function (done) {
-		flow({
+		flow.start({
 			foo: 'bar'
 		}, [
 			function (foo, flow) {
@@ -134,7 +134,7 @@ describe('index', function () {
 		var sub1 = false;
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -170,7 +170,7 @@ describe('index', function () {
 		var sub2 = false;
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -213,7 +213,7 @@ describe('index', function () {
 		var sub = false;
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -246,7 +246,7 @@ describe('index', function () {
 		var sub2 = false;
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -290,7 +290,7 @@ describe('index', function () {
 		var sub2 = false;
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -330,7 +330,7 @@ describe('index', function () {
 		var invoked = [];
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next([0, 1, 2], 'number');
 			},
@@ -355,7 +355,7 @@ describe('index', function () {
 		var invoked = [];
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next([0, 1, 2], 'number');
 			},
@@ -385,7 +385,7 @@ describe('index', function () {
 		var invoked = [];
 		var last = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next([0, 1, 2], 'number');
 			},
@@ -412,7 +412,7 @@ describe('index', function () {
 	it('should die on error', function (done) {
 		var invoked = [];
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next([0, 1, 2], 'number');
 			},
@@ -437,7 +437,7 @@ describe('index', function () {
 	it('should not invoke last flow method when ignored', function (done) {
 		var invoked = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.ignore();
 			},
@@ -455,7 +455,7 @@ describe('index', function () {
 	it('should not invoke last flow when last methond in fork calls ignore', function (done) {
 		var invoked = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -476,7 +476,7 @@ describe('index', function () {
 	it('should invoke last flow method when ignore is called in middle of fork', function (done) {
 		var invoked = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -502,7 +502,7 @@ describe('index', function () {
 	it('should invoke last flow method when next is called at end of fork', function (done) {
 		var invoked = false;
 
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.next();
 			},
@@ -523,7 +523,7 @@ describe('index', function () {
 	});
 
 	it('should error', function (done) {
-		flow({}, [
+		flow.start({}, [
 			function (flow) {
 				flow.error('wtf');
 			}
