@@ -1,0 +1,24 @@
+{
+  "name": "node-control-flow",
+  "description": "A control flow library for javascript intended to handle the orchestration of multiple invocations within a data context.",
+  "version": "0.0.1",
+  "dependencies": {
+    "get-parameter-names": "0.2.0",
+    "underscore": "1.8.3",
+    "async": "0.9.0"
+  },
+  "scripts": {
+    "test": "mocha --recursive --reporter spec test/"
+  },
+  "main": "src/flow.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/parisholley/node-control-flow.git"
+  },
+  "author": "Paris Holley <mail@parisholley.com> (http://parisholley.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "2.2.4",
+    "chai": "2.1.0"
+  }
+}
