@@ -46,16 +46,21 @@ When invoked within a flow, all future steps will not execute the and flow will 
 A wrapper around the okay library, this is a convenience method that is the same as running the example below. If a callback is not passed, flow.next() will be invoked.
 
 ```javascript
-ok(flow.error, function(data){
-
-});
+externalCall(ok(flow.error, function(data){
+	flow.next();
+}));
 ```
 turns into
 
 ```javascript
-flow.ok(function(data){
+externalCall(flow.ok(function(data){
+	flow.next();
+}));
+```
+or
 
-});
+```javascript
+externalCall(flow.ok);
 ```
 
 ## Examples
