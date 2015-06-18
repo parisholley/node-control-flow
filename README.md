@@ -111,10 +111,11 @@ module.exports = {
 			});
 		});
 	},
-	_doThingThree: function(var4, flow){
+	_doThingThree: function(var4, callback){
 		// any method called after _doThingTwo will have access to var4
+		// you also are not required to use the flow object, you can use normal callback as well which defaults to using flow.ok()
 		
-		flow.next();
+		callback();
 	}
 }
 ```
