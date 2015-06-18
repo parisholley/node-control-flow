@@ -3,32 +3,7 @@ var async = require('async');
 var _ = require('underscore');
 var ok = require('okay');
 
-var dynamicMethodExecution = function(ctx, method){
-	var args = [];
-
-	gpn(method).forEach(function (argumentName) {
-		if (typeof ctx[argumentName] === 'undefined') {
-			throw Error('Unable to find ' + argumentName + ' in flow context.');
-		}
-
-		args.push(ctx[argumentName]);
-	});
-
-	return method.apply(undefined, args);
-};
-
 module.exports = {
-	wrap: function(method){
-		return {
-			func: method,
-			args: gpn(method),
-			context: function(flow){
-				return {
-					callback: flow.ok()
-				};
-			}
-		};
-	},
 	start: function (context, methods, callback, parent) {
 		var ignore = false;
 
@@ -105,28 +80,24 @@ module.exports = {
 				}
 			});
 
+			ctx.callback = ctx.flow.ok();
+
 			if (_.isArray(method)) {
 				return module.exports.start(ctx, method, callback, ctx.flow);
 			}
 
 			if(_.isFunction(method)){
-				return dynamicMethodExecution(ctx, method);
-			}
-
-			if(_.isObject(method.context)){
-				var tempCtx = ctx;
-
-				if(_.isFunction(method.context)){
-					tempCtx = _.extend({}, ctx, dynamicMethodExecution(ctx, method.context));
-				};
-
 				var args = [];
 
-				_.each(method.args, function(argumentName){
-					args.push(tempCtx[argumentName]);
+				gpn(method).forEach(function (argumentName) {
+					if (typeof ctx[argumentName] === 'undefined') {
+						throw Error('Unable to find ' + argumentName + ' in flow context.');
+					}
+
+					args.push(ctx[argumentName]);
 				});
 
-				return method.func.apply(undefined, args);
+				return method.apply(undefined, args);
 			}
 
 			throw new Error('invalid flow method defined.');

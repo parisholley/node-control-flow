@@ -2,15 +2,15 @@ require('chai').should();
 var flow = require('../src/flow');
 
 describe('index', function () {
-	it('should succeed when using flow.wrap', function (done) {
+	it('should succeed when using callback pattern', function (done) {
 		flow.start({
 			foo: 'bar'
 		}, [
-			flow.wrap(function (foo, callback) {
+			function (foo, callback) {
 				foo.should.equal('bar');
 
 				callback();
-			})
+			}
 		], function (err) {
 			(err == null).should.be.true;
 
@@ -18,15 +18,15 @@ describe('index', function () {
 		});
 	});
 
-	it('should error out when using flow.wrap', function (done) {
+	it('should error out when using callback pattern', function (done) {
 		flow.start({
 			foo: 'bar'
 		}, [
-			flow.wrap(function (foo, callback) {
+			function (foo, callback) {
 				foo.should.equal('bar');
 
 				callback('fail');
-			})
+			}
 		], function (err) {
 			err.should.equal('fail');
 
