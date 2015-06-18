@@ -1,7 +1,7 @@
 # Control Flow
 [![travis](https://travis-ci.org/parisholley/node-control-flow.svg)](https://travis-ci.org/parisholley/node-control-flow)
 
-[![NPM](https://nodei.co/npm/node-control-flow.png)](https://nodei.co/npm/node-control-flow/)
+[![NPM](https://nodei.co/npm/node-control-flow.png?1)](https://nodei.co/npm/node-control-flow/)
 
 A control flow library for javascript intended to handle the orchestration of multiple invocations within a data context.
 
@@ -94,7 +94,7 @@ module.exports = {
 	},
 	_doThingOne: function(var1, flow){
 		// we have access to the var1 object from our context
-		// flow is always injected as the last argument
+		// flow is always in the context, does not have to be the last parameter
 		
 		flow.next();
 	},

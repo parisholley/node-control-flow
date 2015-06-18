@@ -2,6 +2,38 @@ require('chai').should();
 var flow = require('../src/flow');
 
 describe('index', function () {
+	it('should succeed when using flow.wrap', function (done) {
+		flow.start({
+			foo: 'bar'
+		}, [
+			flow.wrap(function (foo, callback) {
+				foo.should.equal('bar');
+
+				callback();
+			})
+		], function (err) {
+			(err == null).should.be.true;
+
+			done();
+		});
+	});
+
+	it('should error out when using flow.wrap', function (done) {
+		flow.start({
+			foo: 'bar'
+		}, [
+			flow.wrap(function (foo, callback) {
+				foo.should.equal('bar');
+
+				callback('fail');
+			})
+		], function (err) {
+			err.should.equal('fail');
+
+			done();
+		});
+	});
+
 	it('should error out when using flow.ok', function (done) {
 		flow.start({}, [
 			function (flow) {
