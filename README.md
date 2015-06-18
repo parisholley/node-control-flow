@@ -26,14 +26,17 @@ The best example of this would be to pull data from a remote source (like a data
 
 **Note:** You are not required to use the flow object, you can stick with the standard "callback" argument, however you will be able to error or continue to the next step, and not control the flow.
 
-### next([data, itemName])
+### next([object])
 
 Continues processing the flow without interrupting, optionally passing additional data to the context.
 
 #### Arguments
 
-* data - An object of key/value pairs to place in the current context.
-* itemName - When data is an array, it enables fork mode and sets this variable in the context for each item in the list.
+* object - An object of key/value pairs to place in the current context.
+
+### fork(variableName, items)
+
+Enables fork mode by executing each future method in the flow for every item passed in. The item is made available in the context via **varibaleName**.
 
 ### error(err)
 
@@ -177,7 +180,7 @@ module.exports = {
 		flow.next();
 	},
 	_forkStep: function(flow){
-		flow.next(['item1', 'item2'], 'item');
+		flow.fork('item', ['item1', 'item2']);
 	},
 	_multipleOne: function(item, flow){
 		// on the first past this will be called with item = 'item1', after _multipleTwo, this will be called again with item = 'item2'
