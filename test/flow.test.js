@@ -340,7 +340,7 @@ describe('index', function () {
 		});
 	});
 
-	it('should allow for nested forks', function (done) {
+	it('should allow for nested subflows', function (done) {
 		var sub1 = false;
 		var sub2 = false;
 		var last = false;
@@ -387,7 +387,7 @@ describe('index', function () {
 
 		flow.start({}, [
 			function (flow) {
-				flow.next([0, 1, 2], 'number');
+				flow.fork('number', [0, 1, 2]);
 			},
 			function (number, flow) {
 				invoked.push(number);
@@ -412,7 +412,7 @@ describe('index', function () {
 
 		flow.start({}, [
 			function (flow) {
-				flow.next([0, 1, 2], 'number');
+				flow.fork('number', [0, 1, 2]);
 			},
 			function (number, flow) {
 				invoked.push(number);
@@ -442,7 +442,7 @@ describe('index', function () {
 
 		flow.start({}, [
 			function (flow) {
-				flow.next([0, 1, 2], 'number');
+				flow.fork('number', [0, 1, 2]);
 			},
 			function (number, flow) {
 				invoked.push(number);
@@ -469,7 +469,7 @@ describe('index', function () {
 
 		flow.start({}, [
 			function (flow) {
-				flow.next([0, 1, 2], 'number');
+				flow.fork('number', [0, 1, 2]);
 			},
 			function (number, flow) {
 				invoked.push(number);
@@ -507,7 +507,7 @@ describe('index', function () {
 		});
 	});
 
-	it('should not invoke last flow when last methond in fork calls ignore', function (done) {
+	it('should not invoke last flow when last method in subflow calls ignore', function (done) {
 		var invoked = false;
 
 		flow.start({}, [
@@ -528,7 +528,7 @@ describe('index', function () {
 		});
 	});
 
-	it('should invoke last flow method when ignore is called in middle of fork', function (done) {
+	it('should invoke last flow method when ignore is called in middle of subflow', function (done) {
 		var invoked = false;
 
 		flow.start({}, [
@@ -554,7 +554,7 @@ describe('index', function () {
 		});
 	});
 
-	it('should invoke last flow method when next is called at end of fork', function (done) {
+	it('should invoke last flow method when next is called at end of subflow', function (done) {
 		var invoked = false;
 
 		flow.start({}, [

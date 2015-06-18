@@ -42,24 +42,23 @@ module.exports = {
 
 						return ok(this.error, callback);
 					},
-					next: function (data, name) {
-						if (_.isArray(data)) {
-							var queue = [];
+					fork: function(name, items){
+						var queue = [];
 
-							data.forEach(function (item) {
-								var subcontext = {};
-								subcontext[name] = item;
+						items.forEach(function (item) {
+							var subcontext = {};
+							subcontext[name] = item;
 
-								_.extend(subcontext, ctx);
+							_.extend(subcontext, ctx);
 
-								queue.push(function (qCallback) {
-									module.exports.start(subcontext, methods.slice(index + 1), qCallback);
-								});
+							queue.push(function (qCallback) {
+								module.exports.start(subcontext, methods.slice(index + 1), qCallback);
 							});
+						});
 
-							return async.series(queue, doFinished);
-						}
-
+						return async.series(queue, doFinished);
+					},
+					next: function (data) {
 						_.extend(context, data);
 
 						if (methods[index + 1]) {
