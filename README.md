@@ -24,6 +24,8 @@ The best example of this would be to pull data from a remote source (like a data
 
 ## Flow Object API
 
+**Note:** You are not required to use the flow object, you can stick with the standard "callback" argument, however you will be able to error or continue to the next step, and not control the flow.
+
 ### next([data, itemName])
 
 Continues processing the flow without interrupting, optionally passing additional data to the context.
