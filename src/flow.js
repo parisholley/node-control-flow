@@ -7,25 +7,28 @@ module.exports = {
 	start: function (context, methods, callback, parent) {
 		var ignore = false;
 
-		var doFinished = function (err) {
+		var doFinished = function (err, context) {
+			// prevent accidental invocation
+			delete context.flow;
+
 			if (err) {
 				if (parent) {
 					return parent.error(err);
 				}
 
-				return callback(err);
+				return callback(err, context);
 			}
 
 			if (parent) {
 				return parent.next();
 			}
 
-			callback();
+			callback(null, context);
 		};
 
 		var processStep = function (index) {
 			if (ignore) {
-				return doFinished();
+				return doFinished(null, context);
 			}
 
 			var method = methods[index];
@@ -33,16 +36,16 @@ module.exports = {
 			var ctx = _.extend({}, context, {
 				flow: {
 					error: function (err) {
-						callback(err);
+						callback(err, ctx);
 					},
-					ok: function(callback){
-						if(!callback){
+					ok: function (callback) {
+						if (!callback) {
 							callback = this.next;
 						}
 
 						return ok(this.error, callback);
 					},
-					fork: function(name, items){
+					fork: function (name, items) {
 						var queue = [];
 
 						items.forEach(function (item) {
@@ -56,16 +59,20 @@ module.exports = {
 							});
 						});
 
-						return async.series(queue, doFinished);
+						return async.series(queue, function (err) {
+							doFinished(err, ctx);
+						});
 					},
 					next: function (data) {
-						_.extend(context, data);
-
 						if (methods[index + 1]) {
+							_.extend(context, data);
+
 							return processStep(index + 1);
 						}
 
-						doFinished()
+						_.extend(ctx, data);
+
+						doFinished(null, ctx);
 					},
 					ignore: function (chain) {
 						ignore = true;
@@ -74,7 +81,7 @@ module.exports = {
 							return parent.ignore(true);
 						}
 
-						doFinished();
+						doFinished(null, ctx);
 					}
 				}
 			});
@@ -85,7 +92,7 @@ module.exports = {
 				return module.exports.start(ctx, method, callback, ctx.flow);
 			}
 
-			if(_.isFunction(method)){
+			if (_.isFunction(method)) {
 				var args = [];
 
 				gpn(method).forEach(function (argumentName) {
