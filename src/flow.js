@@ -4,39 +4,57 @@ var _ = require('underscore');
 var ok = require('okay');
 
 module.exports = {
-	start: function (context, methods, callback, parent) {
+	start: function (startingContext, methods, callback, parent) {
 		var ignore = false;
 
-		var doFinished = function (err, context) {
-			// prevent accidental invocation
-			delete context.flow;
+		var interceptors = [];
 
-			if (err) {
+		var executeInterceptors = function (err, interceptorContext, interceptorCallback) {
+			if (interceptors.length == 0) {
+				return interceptorCallback(err);
+			}
+
+			var runs = [];
+
+			interceptors.reverse().forEach(function (intercept) {
+				runs.push(function (qCallback) {
+					intercept(err, interceptorContext, qCallback);
+				});
+			});
+
+			async.series(runs, ok(interceptorCallback, function () {
+				interceptorCallback(null, interceptorContext);
+			}))
+		};
+
+		var doFinished = function (err, finishedContext) {
+			// prevent accidental invocation
+			delete finishedContext.flow;
+
+			executeInterceptors(err, finishedContext, function (err) {
 				if (parent) {
-					return parent.error(err);
+					if (err) {
+						return parent.error(err);
+					}
+
+					return parent.next();
 				}
 
-				return callback(err, context);
-			}
-
-			if (parent) {
-				return parent.next();
-			}
-
-			callback(null, context);
+				callback(err, finishedContext);
+			});
 		};
 
 		var processStep = function (index) {
 			if (ignore) {
-				return doFinished(null, context);
+				return doFinished(null, startingContext);
 			}
 
 			var method = methods[index];
 
-			var ctx = _.extend({}, context, {
+			var ctx = _.extend({}, startingContext, {
 				flow: {
 					error: function (err) {
-						callback(err, ctx);
+						doFinished(err, ctx);
 					},
 					ok: function (callback) {
 						if (!callback) {
@@ -65,12 +83,20 @@ module.exports = {
 					},
 					next: function (data) {
 						if (methods[index + 1]) {
-							_.extend(context, data);
+							if (_.isFunction(data)) {
+								interceptors.push(data);
+							} else {
+								_.extend(startingContext, data);
+							}
 
 							return processStep(index + 1);
 						}
 
-						_.extend(ctx, data);
+						if (_.isFunction(data)) {
+							interceptors.push(data);
+						} else {
+							_.extend(ctx, data);
+						}
 
 						doFinished(null, ctx);
 					},

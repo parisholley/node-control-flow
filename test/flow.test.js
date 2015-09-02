@@ -2,6 +2,196 @@ require('chai').should();
 var flow = require('../src/flow');
 
 describe('index', function () {
+	describe('interceptors', function () {
+		it('should work when nested and only parent', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						roll.should.equal(0);
+						roll++;
+
+						callback();
+					});
+				},
+				[
+					function (flow) {
+						flow.next();
+					}
+				]
+			], function (err) {
+				roll.should.equal(1);
+
+				done(err);
+			});
+		});
+
+		it('should work when nested and error', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						roll.should.equal(1);
+						roll++;
+
+						callback();
+					});
+				},
+				[
+					function (flow) {
+						flow.next(function (err, context, callback) {
+							roll.should.equal(0);
+							roll++;
+
+							callback();
+						});
+					},
+					function (flow) {
+						flow.error(true);
+					}
+				]
+			], function (err) {
+				roll.should.equal(2);
+
+				done(err);
+			});
+		});
+
+		it('should work when nested and success', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						roll.should.equal(1);
+						roll++;
+						context.should.not.have.keys('complete');
+
+						callback();
+					});
+				},
+				[
+					function (flow) {
+						flow.next(function (err, context, callback) {
+							roll.should.equal(0);
+							roll++;
+							context.complete.should.be.true;
+
+							callback();
+						});
+					},
+					function (flow) {
+						flow.next({
+							complete: true
+						});
+					}
+				]
+			], function (err) {
+				roll.should.equal(2);
+
+				done(err);
+			});
+		});
+
+		it('should allow chained interceptors', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						roll.should.equal(1);
+						roll++;
+						context.complete.should.be.true;
+
+						callback();
+					});
+				},
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						roll.should.equal(0);
+						roll++;
+						context.complete.should.be.true;
+
+						callback();
+					});
+				},
+				function (flow) {
+					flow.next({
+						complete: true
+					});
+				}
+			], function (err) {
+				roll.should.equal(2);
+
+				done(err);
+			});
+		});
+
+		it('should allow first flow item to intercept completion', function (done) {
+			var called = false;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						called = true;
+						context.complete.should.be.true;
+
+						callback();
+					});
+				},
+				function (flow) {
+					flow.next({
+						complete: true
+					});
+				}
+			], function (err) {
+				called.should.be.true;
+
+				done(err);
+			});
+		});
+
+		it('should allow first flow item to intercept error', function (done) {
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						err.should.be.true;
+
+						callback(err);
+					});
+				},
+				function (flow) {
+					flow.error(true);
+				}
+			], function (err) {
+				err.should.be.true;
+
+				done();
+			});
+		});
+
+		it('should allow first flow item to swallow error', function (done) {
+			flow.start({
+				foo: 'bar'
+			}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						context.foo.should.equal('bar');
+
+						err.should.be.true;
+
+						callback();
+					});
+				},
+				function (flow) {
+					flow.error(true);
+				}
+			], done);
+		});
+	});
+
 	it('should succeed when using callback pattern', function (done) {
 		flow.start({
 			foo: 'bar'

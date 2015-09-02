@@ -301,3 +301,67 @@ module.exports = {
 	}
 }
 ```
+
+### Interceptors
+
+Some times you want execute code regardless of the outcome for a particular flow or subflow. To do this, simply pass a function to the next method instead of data.
+
+#### Intercept Exception
+
+In this example, you can do some additional logic before passing error back up the chain.
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow.start(context, [
+			module.exports._interceptor,
+			module.exports._finalStep
+		], callback);
+	},
+	_interceptor: function(flow){		
+		flow.next(function(err, context, interceptCallback){
+			console.error(err); // Log error
+			
+			// pass it back up the flow stack, will invoke callback(err)
+			interceptCallback(err);
+		});
+	},
+	_finalStep: function(flow){
+		// after this is invoked, the interceptor function above is called
+		flow.error(true);
+	}
+}
+```
+
+#### Swallow Exceptions
+
+In this example, you can ignore any errors passed from the flow and complete successfully.
+
+```javascript
+var flow = require('node-control-flow');
+
+module.exports = {
+	_execute: function (callback) {
+		var context = {};
+
+		flow.start(context, [
+			module.exports._interceptor,
+			module.exports._finalStep
+		], callback);
+	},
+	_interceptor: function(flow){		
+		flow.next(function(err, context, interceptCallback){
+			// we ignore "err" and the flow ends without issue
+			interceptCallback();
+		});
+	},
+	_finalStep: function(flow){
+		// after this is invoked, the interceptor function above is called
+		flow.error(true);
+	}
+}
+```
