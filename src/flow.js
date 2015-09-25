@@ -129,7 +129,11 @@ module.exports = {
 					args.push(ctx[argumentName]);
 				});
 
-				return method.apply(undefined, args);
+				try {
+					return method.apply(undefined, args);
+				} catch (ex) {
+					return callback(ex);
+				}
 			}
 
 			throw new Error('invalid flow method defined.');

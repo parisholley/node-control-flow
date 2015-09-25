@@ -876,6 +876,20 @@ describe('index', function () {
 		});
 	});
 
+	it('should error on bad code', function (done) {
+		flow.start({
+			foo: 'bar'
+		}, [
+			function () {
+				foobar();
+			}
+		], function (err) {
+			err.should.be.ok;
+
+			done();
+		});
+	});
+
 	it('should error', function (done) {
 		flow.start({
 			foo: 'bar'
@@ -891,4 +905,3 @@ describe('index', function () {
 		});
 	});
 })
-;
