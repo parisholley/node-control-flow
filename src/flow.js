@@ -104,7 +104,13 @@ module.exports = {
 						ignore = true;
 
 						if (parent && (index + 1 == methods.length || chain)) {
-							return parent.ignore(true);
+							return executeInterceptors(null, ctx, function (err) {
+								if (err) {
+									return parent.error(err);
+								}
+
+								return parent.ignore(true);
+							});
 						}
 
 						doFinished(null, ctx);

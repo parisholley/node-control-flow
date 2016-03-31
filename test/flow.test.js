@@ -3,6 +3,105 @@ var flow = require('../src/flow');
 
 describe('index', function () {
 	describe('interceptors', function () {
+		it('should execute even if error is bubbled from inner', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						err.should.equal('foo');
+						roll++;
+
+						callback(err);
+					});
+				},
+				function(flow){
+					flow.next();
+				},
+				[
+					function (flow) {
+						flow.next(function (err, context, callback) {
+							roll.should.equal(0);
+							roll++;
+
+							callback('foo');
+						});
+					},
+					function(flow){
+						flow.ignore();
+					}
+				]
+			], function (err) {
+				roll.should.equal(2);
+				err.should.equal('foo');
+
+				done();
+			});
+		});
+
+		it('should bubble up error on nested interceptor problem', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function(flow){
+					flow.next();
+				},
+				[
+					function (flow) {
+						flow.next(function (err, context, callback) {
+							roll.should.equal(0);
+							roll++;
+
+							callback('foo');
+						});
+					},
+					function(flow){
+						flow.ignore();
+					}
+				]
+			], function (err) {
+				roll.should.equal(1);
+				err.should.equal('foo');
+
+				done();
+			});
+		});
+
+		it('should execute both interceptors', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.next(function (err, context, callback) {
+						roll.should.equal(1);
+						roll++;
+
+						callback();
+					});
+				},
+				function(flow){
+					flow.next();
+				},
+				[
+					function (flow) {
+						flow.next(function (err, context, callback) {
+							roll.should.equal(0);
+							roll++;
+
+							callback();
+						});
+					},
+					function(flow){
+						flow.ignore();
+					}
+				]
+			], function (err) {
+				roll.should.equal(2);
+
+				done(err);
+			});
+		});
+
 		it('should work when nested and only parent', function (done) {
 			var roll = 0;
 
