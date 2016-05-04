@@ -752,6 +752,40 @@ describe('index', function () {
 		});
 	});
 
+	it('should override value using function fork but return to normal after', function (done) {
+		var asserts = 0;
+
+		flow.start({
+			foo: 'bar'
+		}, [
+			[
+				function (flow) {
+					flow.fork('number', [1], function(number){
+						return {
+							foo: 'baz'
+						};
+					});
+				},
+				function (foo, flow) {
+					foo.should.eql('baz');
+					asserts++;
+
+					flow.next();
+				}
+			],
+			function (foo, flow) {
+				foo.should.eql('bar');
+				asserts++;
+
+				flow.next();
+			}
+		], function (err) {
+			asserts.should.eql(2);
+
+			done(err);
+		});
+	});
+
 	it('should override value in fork but return to normal after', function (done) {
 		var asserts = 0;
 

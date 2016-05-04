@@ -70,7 +70,13 @@ module.exports = {
 							var subcontext = {};
 							subcontext[name] = item;
 
-							_.extend(subcontext, ctx, data);
+							var additional = data || {};
+
+							if (_.isFunction(data)) {
+								additional = data(item);
+							}
+
+							_.extend(subcontext, ctx, additional);
 
 							queue.push(function (qCallback) {
 								module.exports.start(subcontext, methods.slice(index + 1), qCallback);
