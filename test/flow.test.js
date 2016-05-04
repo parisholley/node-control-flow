@@ -15,7 +15,7 @@ describe('index', function () {
 						callback(err);
 					});
 				},
-				function(flow){
+				function (flow) {
 					flow.next();
 				},
 				[
@@ -27,7 +27,7 @@ describe('index', function () {
 							callback('foo');
 						});
 					},
-					function(flow){
+					function (flow) {
 						flow.ignore();
 					}
 				]
@@ -43,7 +43,7 @@ describe('index', function () {
 			var roll = 0;
 
 			flow.start({}, [
-				function(flow){
+				function (flow) {
 					flow.next();
 				},
 				[
@@ -55,7 +55,7 @@ describe('index', function () {
 							callback('foo');
 						});
 					},
-					function(flow){
+					function (flow) {
 						flow.ignore();
 					}
 				]
@@ -79,7 +79,7 @@ describe('index', function () {
 						callback();
 					});
 				},
-				function(flow){
+				function (flow) {
 					flow.next();
 				},
 				[
@@ -91,7 +91,7 @@ describe('index', function () {
 							callback();
 						});
 					},
-					function(flow){
+					function (flow) {
 						flow.ignore();
 					}
 				]
@@ -747,6 +747,36 @@ describe('index', function () {
 			sub2.should.be.ok;
 
 			context.foo.should.equal('bar');
+
+			done(err);
+		});
+	});
+
+	it('should override value in fork but return to normal after', function (done) {
+		var asserts = 0;
+
+		flow.start({
+			foo: 'bar'
+		}, [
+			[
+				function (flow) {
+					flow.fork('number', [1], {foo: 'baz'});
+				},
+				function (foo, flow) {
+					foo.should.eql('baz');
+					asserts++;
+
+					flow.next();
+				}
+			],
+			function (foo, flow) {
+				foo.should.eql('bar');
+				asserts++;
+
+				flow.next();
+			}
+		], function (err) {
+			asserts.should.eql(2);
 
 			done(err);
 		});

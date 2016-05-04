@@ -63,14 +63,14 @@ module.exports = {
 
 						return ok(this.error, callback);
 					},
-					fork: function (name, items) {
+					fork: function (name, items, data) {
 						var queue = [];
 
 						items.forEach(function (item) {
 							var subcontext = {};
 							subcontext[name] = item;
 
-							_.extend(subcontext, ctx);
+							_.extend(subcontext, ctx, data);
 
 							queue.push(function (qCallback) {
 								module.exports.start(subcontext, methods.slice(index + 1), qCallback);
