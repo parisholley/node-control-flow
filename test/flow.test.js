@@ -3,12 +3,43 @@ var flow = require('../src/flow');
 
 describe('index', function () {
 	describe('interceptors', function () {
+		it('should pass data down flow when intercepting', function (done) {
+			var roll = 0;
+
+			flow.start({}, [
+				function (flow) {
+					flow.intercept(function (err, context, callback) {
+						err.should.equal('foo');
+						roll++;
+
+						callback(err);
+					}, {
+						foo: 'bar'
+					});
+				},
+				function (flow, foo) {
+					roll++;
+					foo.should.equal('bar');
+
+					flow.next();
+				},
+				function (flow) {
+					flow.error('foo');
+				}
+			], function (err) {
+				roll.should.equal(2);
+				err.should.equal('foo');
+
+				done();
+			});
+		});
+
 		it('should execute even if error is bubbled from inner', function (done) {
 			var roll = 0;
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						err.should.equal('foo');
 						roll++;
 
@@ -20,7 +51,7 @@ describe('index', function () {
 				},
 				[
 					function (flow) {
-						flow.next(function (err, context, callback) {
+						flow.intercept(function (err, context, callback) {
 							roll.should.equal(0);
 							roll++;
 
@@ -48,7 +79,7 @@ describe('index', function () {
 				},
 				[
 					function (flow) {
-						flow.next(function (err, context, callback) {
+						flow.intercept(function (err, context, callback) {
 							roll.should.equal(0);
 							roll++;
 
@@ -72,7 +103,7 @@ describe('index', function () {
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						roll.should.equal(1);
 						roll++;
 
@@ -84,7 +115,7 @@ describe('index', function () {
 				},
 				[
 					function (flow) {
-						flow.next(function (err, context, callback) {
+						flow.intercept(function (err, context, callback) {
 							roll.should.equal(0);
 							roll++;
 
@@ -107,7 +138,7 @@ describe('index', function () {
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						roll.should.equal(0);
 						roll++;
 
@@ -131,7 +162,7 @@ describe('index', function () {
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						roll.should.equal(1);
 						roll++;
 
@@ -140,7 +171,7 @@ describe('index', function () {
 				},
 				[
 					function (flow) {
-						flow.next(function (err, context, callback) {
+						flow.intercept(function (err, context, callback) {
 							roll.should.equal(0);
 							roll++;
 
@@ -163,7 +194,7 @@ describe('index', function () {
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						roll.should.equal(1);
 						roll++;
 						context.should.not.have.keys('complete');
@@ -173,7 +204,7 @@ describe('index', function () {
 				},
 				[
 					function (flow) {
-						flow.next(function (err, context, callback) {
+						flow.intercept(function (err, context, callback) {
 							roll.should.equal(0);
 							roll++;
 							context.complete.should.be.true;
@@ -199,7 +230,7 @@ describe('index', function () {
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						roll.should.equal(1);
 						roll++;
 						context.complete.should.be.true;
@@ -208,7 +239,7 @@ describe('index', function () {
 					});
 				},
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						roll.should.equal(0);
 						roll++;
 						context.complete.should.be.true;
@@ -233,7 +264,7 @@ describe('index', function () {
 
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						called = true;
 						context.complete.should.be.true;
 
@@ -255,7 +286,7 @@ describe('index', function () {
 		it('should allow first flow item to intercept error', function (done) {
 			flow.start({}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						err.should.be.true;
 
 						callback(err);
@@ -276,7 +307,7 @@ describe('index', function () {
 				foo: 'bar'
 			}, [
 				function (flow) {
-					flow.next(function (err, context, callback) {
+					flow.intercept(function (err, context, callback) {
 						context.foo.should.equal('bar');
 
 						err.should.be.true;
@@ -760,7 +791,7 @@ describe('index', function () {
 		}, [
 			[
 				function (flow) {
-					flow.fork('number', [1], function(number){
+					flow.fork('number', [1], function (number) {
 						return {
 							foo: 'baz'
 						};

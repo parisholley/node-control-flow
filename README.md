@@ -24,11 +24,15 @@ The best example of this would be to pull data from a remote source (like a data
 
 ## Flow Object API
 
-**Note:** You are not required to use the flow object, you can stick with the standard "callback" argument, however you will be able to error or continue to the next step, and not control the flow.
+**Note:** You are not required to use the flow object, you can stick with the standard "callback" argument, however you will only be able to error or continue to the next step, and not control the flow.
 
 ### next([object])
 
 Continues processing the flow without interrupting, optionally passing additional data to the context.
+
+### intercept(function(err, context, callback), [object])
+
+Handle any exceptions that are thrown after the flow continues or in the absence of any error, execute logic when the flow has completed.
 
 #### Arguments
 
@@ -323,11 +327,13 @@ module.exports = {
 		], callback);
 	},
 	_interceptor: function(flow){		
-		flow.next(function(err, context, interceptCallback){
+		flow.intercept(function(err, context, interceptCallback){
 			console.error(err); // Log error
 			
 			// pass it back up the flow stack, will invoke callback(err)
 			interceptCallback(err);
+		},{
+		    foo: "bar" // similar to calling .next(), you can pass data along the chain
 		});
 	},
 	_finalStep: function(flow){
@@ -354,7 +360,7 @@ module.exports = {
 		], callback);
 	},
 	_interceptor: function(flow){		
-		flow.next(function(err, context, interceptCallback){
+		flow.intercept(function(err, context, interceptCallback){
 			// we ignore "err" and the flow ends without issue
 			interceptCallback();
 		});

@@ -87,22 +87,33 @@ module.exports = {
 							doFinished(err, ctx);
 						});
 					},
-					next: function (data) {
+					intercept: function (func, data) {
 						if (methods[index + 1]) {
-							if (_.isFunction(data)) {
-								interceptors.push(data);
-							} else {
+							interceptors.push(func);
+
+							if (data) {
 								_.extend(startingContext, data);
 							}
 
 							return processStep(index + 1);
 						}
 
-						if (_.isFunction(data)) {
-							interceptors.push(data);
-						} else {
+						interceptors.push(data);
+
+						if (data) {
 							_.extend(ctx, data);
 						}
+
+						doFinished(null, ctx);
+					},
+					next: function (data) {
+						if (methods[index + 1]) {
+							_.extend(startingContext, data);
+
+							return processStep(index + 1);
+						}
+
+						_.extend(ctx, data);
 
 						doFinished(null, ctx);
 					},
